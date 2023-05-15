@@ -1,0 +1,104 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/7Blessings7/Final-Project-CMS204/blob/main/Pair_12_Code.Bituin_Jenny-Pedraja_Jairaipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "h2ceaLvsF8FE",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "b78b63a7-49d5-4aeb-85b3-cc8e904cf36e"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "The shortest distance from Cainta to Nagcarlan is 139 kilometers.\n",
+            "\n",
+            "The shortest path from Cainta to Nagcarlan is by taking the following stops/locations:\n",
+            "['Cainta', 'Mandaluyong', 'Cubao', 'San Pablo City', 'Nagcarlan']\n"
+          ]
+        }
+      ],
+      "source": [
+        "import sys                                                     #import sys library to be able to assign infinite value to all elements in the graph\n",
+        "from heapq import heapify, heappush                            #import heapify and heappush functions from the heapq library to easily implement these functions\n",
+        "\n",
+        "def dijkstra(graph,src,dest):\n",
+        "  inf = sys.maxsize                                             #initialize the infinte value which is the maximum value that the system can take\n",
+        "  node_data = {'Cainta' :{'cost':inf, 'pred':[]},               #create a dictionary called node_data, which contains the dictionaries of different nodes. Each node has the variables 'cost' and 'pred':\n",
+        "               'Mandaluyong' :{'cost':inf, 'pred':[]},             #'cost' refers to the estimate (in kilometers) of reaching the node or the location\n",
+        "               'Cubao' :{'cost':inf, 'pred':[]},                   #'pred' refers to the predecessor node of the node identified. The set of predecessors will allow us to create a code that will give the path from source node to destination node.\n",
+        "               'Buendia' :{'cost':inf, 'pred':[]},                 #Since the distance from source node to all other locations has not yet been determined, the cost is initialized as infinite and pred is set as empty.\n",
+        "               'San Pablo City' :{'cost':inf, 'pred':[]},\n",
+        "               'Sta. Cruz' :{'cost':inf, 'pred':[]},\n",
+        "               'Nagcarlan' :{'cost':inf, 'pred':[]}\n",
+        "  }\n",
+        "  \n",
+        "  node_data[src]['cost'] = 0                                    #In Dijkstra's algorithm, the cost of the source node should be set at 0\n",
+        "  visited = []                                                  #initialize visited locations as an empty list\n",
+        "  temp = src                                                    #create a temporary variable of the source, which will be the node of the currently known shortest distance from each node to the source node\n",
+        "  N = len(graph)                                                #measure the length/order of the graph and assign to N. This is the number of nodes/locations.                                                \n",
+        "  for i in range(N-1):                                          #loop through the length of the graph minus 1.                                            \n",
+        "    if temp not in visited:                                     #find out whether temporary source node is in the visited array or not\n",
+        "      visited.append(temp)                                      #if the node is not yet visited, append the temporary source node in the visited array\n",
+        "      min_heap = []                                             #create an empty list and assign to min-heap\n",
+        "      for j in graph[temp]:                                     #iterate through each adjacent nodes of temporary node to find out which of the neighbor nodes have the minimum cost\n",
+        "        if j not in visited:                                    #if the adjacent node is not yet visited, then:\n",
+        "          cost = node_data[temp]['cost'] + graph[temp][j]       #calculate the cost of the temporary source node, then add the distance from temporary source node to each adjacent nodes. Assign the resulting value to the name \"cost\"\n",
+        "          if cost < node_data[j]['cost']:                       #compare the cost calculated with the cost existing in node_data dictionary. \n",
+        "            node_data[j]['cost'] = cost                         #if the newly calculated cost is less than the value of the cost of the adjacent node in the existing node_data dictionary, then the newly calculated cost will be re-assigned to the value of the cost of the adjacent nodes in the node_data dictionary\n",
+        "            node_data[j]['pred'] = node_data[temp]['pred'] + [temp] #additionally, it will also reassign the value of the 'pred' key of the adjacent node in the node_data dictionary to the name of predecessor node of the temporary source node and concatenate the list of predecessors as you visit the nodes\n",
+        "          heappush(min_heap,(node_data[j]['cost'],j))           #push the cost of the visited nodes and their coressponding node variables (j) in the min_heap using the heappush built-in function.  \n",
+        "    heapify(min_heap)                                           #to identify the minimum cost node, use heapify function to convert \"min-heap\" array into an actual min_heap\n",
+        "    temp = min_heap[0][1]                                       #reaassign the value of the temporary source node to the minimum cost adjacent node (This is the j variable from the min_heap ie. [0] = node_data['cost],j of minimum cost node; [0][1] = j of minimum cost node). The value will continue to be reassigned until it reaches the destination node.\n",
+        "  print(\"The shortest distance from Cainta to Nagcarlan is\", str(node_data[dest]['cost']), \"kilometers.\")    #print the value of the cost of the destination node\n",
+        "  print(\"\\nThe shortest path from Cainta to Nagcarlan is by taking the following stops/locations:\\n\" + str(node_data[dest]['pred'] + [dest]))  #print the predecessor nodes and append the desintion node\n",
+        "\n",
+        "\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "  graph = {                                                     #data of graph\n",
+        "    'Cainta': {'Cubao':47, 'Mandaluyong':31},                 #each node has its own dictionary containing a set of key-value pair/s (key = adjacent node; value = distance from node)\n",
+        "    'Mandaluyong': {'Buendia':13, 'Cubao':6},\n",
+        "    'Cubao': {'Buendia':8, 'San Pablo City':86},\n",
+        "    'Buendia': {'San Pablo City':79, 'Sta. Cruz':85},\n",
+        "    'San Pablo City': {'Nagcarlan':16, 'Sta. Cruz':32},\n",
+        "    'Sta. Cruz': {'Nagcarlan':19},\n",
+        "    'Nagcarlan' :{}\n",
+        "  }\n",
+        "    \n",
+        "  source = 'Cainta'                                              #source node from graph\n",
+        "  destination = 'Nagcarlan'                                      #destination node from graph\n",
+        "  dijkstra(graph,source,destination)                             #implement the dijkstra function"
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
